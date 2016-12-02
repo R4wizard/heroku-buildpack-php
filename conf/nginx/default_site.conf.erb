@@ -1,7 +1,27 @@
 # Default configuration for non-framework apps
 root /app/<%= ENV['DOCUMENT_ROOT'] %>;
 
-location ~ \.php$ {
+location /deploy {
+	rewrite ^/deploy/$ /deploy redirect;
+}
+location = /deploy {
+	rewrite ^(.*)$ /deploy.php break;
+}
+location = /config.ini {
+	rewrite ^(.*)$ /index.php break;
+}
+location /assets {
+	rewrite ^/assets/i/(.*)$ /classes/TimThumb/timthumb.php?src=$1 break;
+}
+location / {
+	rewrite ^/?$ /index.php?dachi_module=default&dachi_page=default&dachi_action=default&dachi_extension=default break;
+	rewrite ^/([a-zA-Z0-9_.-]+)/?$ /index.php?dachi_module=$1&dachi_page=default&dachi_action=default&dachi_extension=default break;
+	rewrite ^/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/?$ /index.php?dachi_module=$1&dachi_page=$2&dachi_action=default&dachi_extension=default break;
+	rewrite ^/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/?$ /index.php?dachi_module=$1&dachi_page=$2&dachi_action=$3&dachi_extension=default break;
+	rewrite ^/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/([a-zA-Z0-9_.-]+)/?$ /index.php?dachi_module=$1&dachi_page=$2&dachi_action=$3&dachi_extension=$4 break;
+}
+
+location /index.php$ {
     include fastcgi_params;
     fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
     fastcgi_pass php;
